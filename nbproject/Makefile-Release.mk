@@ -35,6 +35,8 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/_ext/d2aa488a/8ledSim.o \
+	${OBJECTDIR}/_ext/d2aa488a/ports.o \
 	${OBJECTDIR}/main.o
 
 
@@ -61,6 +63,16 @@ LDLIBSOPTIONS=
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tp11: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tp11 ${OBJECTFILES} ${LDLIBSOPTIONS}
+
+${OBJECTDIR}/_ext/d2aa488a/8ledSim.o: ../tp10/8ledSim.c
+	${MKDIR} -p ${OBJECTDIR}/_ext/d2aa488a
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/d2aa488a/8ledSim.o ../tp10/8ledSim.c
+
+${OBJECTDIR}/_ext/d2aa488a/ports.o: ../tp10/ports.c
+	${MKDIR} -p ${OBJECTDIR}/_ext/d2aa488a
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/d2aa488a/ports.o ../tp10/ports.c
 
 ${OBJECTDIR}/main.o: main.c
 	${MKDIR} -p ${OBJECTDIR}
