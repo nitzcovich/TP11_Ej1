@@ -4,7 +4,7 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>../tp10/ports.h</itemPath>
+      <itemPath>ports.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -13,9 +13,9 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>../tp10/8ledSim.c</itemPath>
+      <itemPath>8ledSim.c</itemPath>
       <itemPath>main.c</itemPath>
-      <itemPath>../tp10/ports.c</itemPath>
+      <itemPath>ports.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -56,13 +56,13 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="../tp10/8ledSim.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../tp10/ports.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../tp10/ports.h" ex="false" tool="3" flavor2="0">
+      <item path="8ledSim.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="main.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="ports.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="ports.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -85,13 +85,13 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="../tp10/8ledSim.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../tp10/ports.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="../tp10/ports.h" ex="false" tool="3" flavor2="0">
+      <item path="8ledSim.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="main.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="ports.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="ports.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>
