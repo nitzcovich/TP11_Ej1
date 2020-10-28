@@ -36,7 +36,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/8ledSim.o \
-	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/ports.o
 
 
@@ -68,11 +67,6 @@ ${OBJECTDIR}/8ledSim.o: 8ledSim.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/8ledSim.o 8ledSim.c
-
-${OBJECTDIR}/main.o: main.c
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
 
 ${OBJECTDIR}/ports.o: ports.c
 	${MKDIR} -p ${OBJECTDIR}

@@ -14,7 +14,6 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>8ledSim.c</itemPath>
-      <itemPath>main.c</itemPath>
       <itemPath>ports.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -58,8 +57,6 @@
       </compileType>
       <item path="8ledSim.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="main.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="ports.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="ports.h" ex="false" tool="3" flavor2="0">
@@ -86,8 +83,6 @@
         </asmTool>
       </compileType>
       <item path="8ledSim.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="main.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="ports.c" ex="false" tool="0" flavor2="0">
       </item>
