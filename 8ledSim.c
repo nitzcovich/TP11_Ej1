@@ -10,6 +10,7 @@
 
 static void draw_mouse_button_led(int but, bool down);
 static void button_msk(int but,bool estado);
+static void manejo_leds(int led, bool estado);
 
 #define LEDs_EJE_Y 250
 #define B0_EJE_X 800
@@ -210,10 +211,10 @@ int main(void) {
                     int n;
                     for(n=0;n<=7;n++){
                         if(bitGet(puertoA,n)== 1){
-                            //al_draw_filled_circle(B7_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
+                            manejo_leds(n,1);
                             draw_mouse_button_led(n+1,false);                            
                         }else if (bitGet(puertoA,n)== 0){
-                            //al_draw_filled_circle(B7_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
+                            manejo_leds(n,0);
                             draw_mouse_button_led(n+1,true);   
                         }                    
                     }
@@ -225,10 +226,10 @@ int main(void) {
                     int n;
                     for(n=0;n<=7;n++){
                         if(bitGet(puertoA,n)== 1){
-                            //al_draw_filled_circle(B7_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
+                            manejo_leds(n,1);
                             draw_mouse_button_led(n+1,false);                            
                         }else if (bitGet(puertoA,n)== 0){
-                            //al_draw_filled_circle(B7_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
+                            manejo_leds(n,0);
                             draw_mouse_button_led(n+1,true);   
                         }                    
                     }
@@ -240,10 +241,10 @@ int main(void) {
                     int n;
                     for(n=0;n<=7;n++){
                         if(bitGet(puertoA,n)== 1){
-                            //al_draw_filled_circle(B7_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
+                            manejo_leds(n,1);
                             draw_mouse_button_led(n+1,false);                            
                         }else if (bitGet(puertoA,n)== 0){
-                            //al_draw_filled_circle(B7_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
+                            manejo_leds(n,0);
                             draw_mouse_button_led(n+1,true);   
                         }                    
                     }
@@ -274,30 +275,7 @@ int main(void) {
         printf("-Ingresar la letra 'c' para apagar todos los LEDs.\n");
         printf("-Ingresar la letra 's' para encender todos los LEDs.\n");
         printf("-Ingresar la letra 'q' para salir del p.\n");
-        
-        char letra = 0;
-        uint16_t mask_t = 0x00FF;
-        while((letra=getchar())!= '\n'){ // se imlementan las funciones ya creadas
-            if (letra == 'q'){
-                flag=0; //termine el programa, sale del primer while.
-            }else if (letra =='t'){
-                maskToggle( puertoA, mask_t);
-                imprimir_puerto(puertoA);
-            }else if (letra == 'c'){
-                maskOff( puertoA, mask_t);
-                imprimir_puerto(puertoA);
-            }else if (letra == 's'){
-                maskOn( puertoA, mask_t);
-                imprimir_puerto(puertoA);               
-            }else if(letra>='0' && letra <='7'){
-                char valor = PASAJE_DECIMAL(letra);
-                bitSet(puertoA,valor);
-                imprimir_puerto(puertoA);
-            }else{
-                printf("Ingresaste una opcion INVALIDA\n");
-            }
-        }
-    }
+       
     */
  
     return (EXIT_SUCCESS);
@@ -338,4 +316,18 @@ static void button_msk(int but, bool estado){
        al_draw_filled_rectangle(x-BOTON_MSK_ANCHO/2, y-BOTON_MSK_ALTO/2, x + BOTON_MSK_ANCHO/2, y + BOTON_MSK_ALTO/2, black);
     }
     
+}
+
+static void manejo_leds(int led, bool estado){
+    int offset[8] = {B0_EJE_X, B1_EJE_X, B2_EJE_X, B3_EJE_X,B4_EJE_X, B5_EJE_X, B6_EJE_X, B7_EJE_X};
+    ALLEGRO_COLOR grey = al_map_rgb(155, 155, 155);;
+    ALLEGRO_COLOR black = al_map_rgb(0, 0, 0);
+    int x = offset[led];
+   
+    if (estado == 1){
+        al_draw_filled_circle(x,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
+    }else{
+        al_draw_filled_circle(x,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(255,255,255));
+    }
+   
 }
