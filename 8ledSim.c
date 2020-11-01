@@ -6,6 +6,9 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_native_dialog.h>
 #include "allegro5/allegro_image.h"
+#include <allegro5/allegro_font.h> //manejo de fonts
+#include <allegro5/allegro_ttf.h> //Manejo de ttfs
+
 
 
 static void draw_mouse_button_led(int but, bool down);
@@ -39,12 +42,22 @@ static void manejo_leds(int led, bool estado);
 
 #define MASK 0x00FF
 
+#define FPS    30.0
+enum MYKEYS {KEY_B};//letras que se van a usar
+
 int main(void) {
     
     ALLEGRO_DISPLAY * display = NULL;
-    ALLEGRO_EVENT_QUEUE * event_queue = NULL;
+    ALLEGRO_EVENT_QUEUE * event_queue = NULL;    
+    ALLEGRO_TIMER *timer = NULL;
+    ALLEGRO_FONT * font = NULL;
+    ALLEGRO_BITMAP *logo;
+    
     bool close_display = false; //explicar bool tipo de dato
     int i = 0;
+    bool redraw = false;
+    
+    bool key_pressed[1] = {false};
 
     if (!al_init()) {
         fprintf(stderr, "failed to initialize allegro!\n");
@@ -55,8 +68,20 @@ int main(void) {
     if (!event_queue) {
         fprintf(stderr, "failed to create event_queue!\n");
         return -1;
-    }     
+    }
     
+        if (!al_install_keyboard()) {
+        fprintf(stderr, "failed to initialize the keyboard!\n");
+        return -1;
+    }
+
+    timer = al_create_timer(1.0 / FPS);
+    if (!timer) {
+        fprintf(stderr, "failed to create timer!\n");
+        return -1;
+    }
+    
+
     display = al_create_display(900,640); //(ancho,alto)
     al_set_window_title(display,"Simulador 8 LEDs en el puerto A");
     if (!display) {
@@ -64,7 +89,41 @@ int main(void) {
         return -1;
     }
     al_clear_to_color(al_map_rgb(255, 255, 255));
- 
+    
+    //Inicializa y dibuja el texto
+    al_init_font_addon(); // initialize the font addon
+    al_init_ttf_addon(); // initialize the ttf (True Type Font) addon
+    font = al_load_ttf_font("disney.ttf", 13, 0);
+    if (!font) {
+        fprintf(stderr, "Could not load 'disney.ttf'.\n");
+        return -1;
+    }
+    al_draw_text(font, al_map_rgb(0, 0, 0), (260) ,(410), ALLEGRO_ALIGN_CENTER, "Toogle todo");
+    al_draw_text(font, al_map_rgb(0, 0, 0), (260) ,(470), ALLEGRO_ALIGN_CENTER, "Prender todo");
+    al_draw_text(font, al_map_rgb(0, 0, 0), (260) ,(530), ALLEGRO_ALIGN_CENTER, "Apagar todo");
+    al_draw_text(font, al_map_rgb(0, 0, 0), (600) ,(450), ALLEGRO_ALIGN_CENTER, "Simulador de 8 LEDs conectados al puerto A.");
+    al_draw_text(font, al_map_rgb(0, 0, 0), (600) ,(470), ALLEGRO_ALIGN_CENTER,"Tocando la tecla b todos los led");
+    al_draw_text(font, al_map_rgb(0, 0, 0), (600) ,(490), ALLEGRO_ALIGN_CENTER,"comenzaran a parpadear");
+    
+    //Inicializa y dibuja el logo
+    if (!al_init_image_addon()) {
+        fprintf(stderr, "Unable to start image addon \n"); //Igual que printf pero imprime al error std 
+        al_uninstall_system();
+        return -1;
+    }
+    if (!(logo = al_load_bitmap("itba_logo-2000x664.png"))) {
+        fprintf(stderr, "Unable to load logo\n");
+        al_uninstall_system();
+        al_shutdown_image_addon();
+        al_destroy_display(display);
+        return -1;
+    }
+    al_draw_scaled_bitmap(logo,
+            0, 0, al_get_bitmap_width(logo), al_get_bitmap_height(logo), //imagen
+            200, 0,  //Posicion donde lo dibuja
+            500, 200, // TE LO DIBUJA DE 500 X200
+            0);
+    
     al_install_mouse();
     if (!al_is_mouse_installed()){
         close_display=al_show_native_message_box(display,"Error","No se pudo inicializar correctamente el mouse","El programa se cerrara automaticamente ","OK",ALLEGRO_MESSAGEBOX_ERROR);
@@ -75,8 +134,12 @@ int main(void) {
     // a medida que vayan sucediendo 
     al_register_event_source(event_queue, al_get_display_event_source(display));
     al_register_event_source(event_queue, al_get_mouse_event_source());
-    //al_register_event_source(event_queue,al_get_keyboard_event_source());
+    al_register_event_source(event_queue, al_get_timer_event_source(timer));
+    al_register_event_source(event_queue, al_get_keyboard_event_source()); //REGISTRAMOS EL TECLADO
+ 
 
+    //inicializacion del timer
+    al_start_timer(timer);
     
     //inicializacion de los leds en el display, en forma de circulo
     al_init_primitives_addon();
@@ -88,8 +151,9 @@ int main(void) {
     al_draw_circle(B5_EJE_X,LEDs_EJE_Y,LEDs_RATIO+2,al_map_rgb(0,0,0),2);
     al_draw_circle(B6_EJE_X,LEDs_EJE_Y,LEDs_RATIO+2,al_map_rgb(0,0,0),2);
     al_draw_circle(B7_EJE_X,LEDs_EJE_Y,LEDs_RATIO+2,al_map_rgb(0,0,0),2);
-    
     //inicializacion de botones
+    
+
     int n;
     for(n=1;n<=8;n++){
         draw_mouse_button_led(n,true);
@@ -101,14 +165,104 @@ int main(void) {
     
     
     al_flip_display();
+    
+    char flag_b=0; //Flag de la tecla b  
+    
     while (!close_display) {
         ALLEGRO_EVENT events;
         
         if (al_get_next_event(event_queue, &events)) //Toma un evento de la cola, VER RETURN EN DOCUMENT.
         {
-            
+            if (events.type == ALLEGRO_EVENT_TIMER) {
+            if (key_pressed[KEY_B])
+                {
+                        if (flag_b == 0)
+                        {
+                           flag_b = 1;
+                        }
+                        else if (flag_b == 1)
+                        {
+                            flag_b = 0;
+                        }
+                }        
+                   if(flag_b==1)
+                       {
+                       
+                            if (bitGet(puertoA,0)==1){
+                                al_draw_filled_circle(B0_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(255,255,255));
+                            }
+                            if (bitGet(puertoA,1)==1){
+                                al_draw_filled_circle(B1_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(255,255,255));
+                            }
+                            if (bitGet(puertoA,2)==1){
+                                al_draw_filled_circle(B2_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(255,255,255));
+                            }
+                            if (bitGet(puertoA,3)==1){
+                                al_draw_filled_circle(B3_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(255,255,255));
+                            }
+                            if (bitGet(puertoA,4)==1){
+                                al_draw_filled_circle(B4_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(255,255,255));
+                            }
+                            if (bitGet(puertoA,5)==1){
+                                al_draw_filled_circle(B5_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(255,255,255));
+                            }
+                            if (bitGet(puertoA,6)==1){
+                                al_draw_filled_circle(B6_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(255,255,255));
+                            }
+                            if (bitGet(puertoA,7)==1){
+                                al_draw_filled_circle(B7_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(255,255,255));
+                            }
+                            
+                            al_flip_display();
+                            
+                            if (bitGet(puertoA,0)==1){
+                                al_draw_filled_circle(B0_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
+                            }
+                            if (bitGet(puertoA,1)==1){
+                                al_draw_filled_circle(B1_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
+                            }
+                            if (bitGet(puertoA,2)==1){
+                                al_draw_filled_circle(B2_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
+                            }
+                            if (bitGet(puertoA,3)==1){
+                                al_draw_filled_circle(B3_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
+                            }
+                            if (bitGet(puertoA,4)==1){
+                                al_draw_filled_circle(B4_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
+                            }
+                            if (bitGet(puertoA,5)==1){
+                                al_draw_filled_circle(B5_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
+                            }
+                            if (bitGet(puertoA,6)==1){
+                                al_draw_filled_circle(B6_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
+                            }
+                            if (bitGet(puertoA,7)==1){
+                                al_draw_filled_circle(B7_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
+                            }                            
+                            al_flip_display();
+                       }
+ 
+                
+            redraw = true;
+            }
+       
             if (events.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
                 close_display = true;
+            }
+            
+            else if (events.type == ALLEGRO_EVENT_KEY_DOWN) {
+                switch (events.keyboard.keycode) {
+                    case ALLEGRO_KEY_B:
+                        key_pressed[KEY_B] = true;
+                        break;
+                }
+            }
+                else if (events.type == ALLEGRO_EVENT_KEY_UP) {
+                switch (events.keyboard.keycode) {
+                    case ALLEGRO_KEY_B:
+                        key_pressed[KEY_B] = false;
+                        break;
+                }
             }
             
             if(events.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
@@ -262,22 +416,9 @@ int main(void) {
 
     al_destroy_display(display); //Destruir recursor empleados 
     al_destroy_event_queue(event_queue);
+    al_destroy_timer(timer);
     //Recordar al init es "destruido" automaticamente 
 
-    /*
-    printf("Simulador de 8 LEDs conectados al puerto A\n");
-    int flag = 1; //el programa se ejecuta mientras que el flag sea 1.
-    
-    while(flag){
-        printf("Opciones para manipular los LEDs:\n");
-        printf("-Un numero de 0 a 7 correspondiente al LED que se quiere prender.\n");
-        printf("-Ingresar la letra 't' para que todos los LEDs cambien al estado puesto.\n");
-        printf("-Ingresar la letra 'c' para apagar todos los LEDs.\n");
-        printf("-Ingresar la letra 's' para encender todos los LEDs.\n");
-        printf("-Ingresar la letra 'q' para salir del p.\n");
-       
-    */
- 
     return (EXIT_SUCCESS);
 }
 

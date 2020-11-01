@@ -9,6 +9,8 @@
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
                    projectFiles="true">
+      <itemPath>disney.ttf</itemPath>
+      <itemPath>itba_logo-2000x664.png</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
@@ -57,6 +59,10 @@
       </compileType>
       <item path="8ledSim.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="disney.ttf" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="itba_logo-2000x664.png" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="ports.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="ports.h" ex="false" tool="3" flavor2="0">
@@ -83,6 +89,10 @@
         </asmTool>
       </compileType>
       <item path="8ledSim.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="disney.ttf" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="itba_logo-2000x664.png" ex="false" tool="3" flavor2="0">
       </item>
       <item path="ports.c" ex="false" tool="0" flavor2="0">
       </item>
