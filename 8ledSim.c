@@ -42,7 +42,7 @@ static void manejo_leds(int led, bool estado);
 
 #define MASK 0x00FF
 
-#define FPS    30.0
+#define FPS    1.0 //los led van a parpadear cada un segundo cada 1 segundo
 enum MYKEYS {KEY_B};//letras que se van a usar
 
 int main(void) {
@@ -70,7 +70,7 @@ int main(void) {
         return -1;
     }
     
-        if (!al_install_keyboard()) {
+    if (!al_install_keyboard()) {
         fprintf(stderr, "failed to initialize the keyboard!\n");
         return -1;
     }
@@ -80,8 +80,7 @@ int main(void) {
         fprintf(stderr, "failed to create timer!\n");
         return -1;
     }
-    
-
+   
     display = al_create_display(900,640); //(ancho,alto)
     al_set_window_title(display,"Simulador 8 LEDs en el puerto A");
     if (!display) {
@@ -101,9 +100,12 @@ int main(void) {
     al_draw_text(font, al_map_rgb(0, 0, 0), (260) ,(410), ALLEGRO_ALIGN_CENTER, "Toogle todo");
     al_draw_text(font, al_map_rgb(0, 0, 0), (260) ,(470), ALLEGRO_ALIGN_CENTER, "Prender todo");
     al_draw_text(font, al_map_rgb(0, 0, 0), (260) ,(530), ALLEGRO_ALIGN_CENTER, "Apagar todo");
-    al_draw_text(font, al_map_rgb(0, 0, 0), (600) ,(450), ALLEGRO_ALIGN_CENTER, "Simulador de 8 LEDs conectados al puerto A.");
-    al_draw_text(font, al_map_rgb(0, 0, 0), (600) ,(470), ALLEGRO_ALIGN_CENTER,"Tocando la tecla b todos los led");
-    al_draw_text(font, al_map_rgb(0, 0, 0), (600) ,(490), ALLEGRO_ALIGN_CENTER,"comenzaran a parpadear");
+    al_draw_text(font, al_map_rgb(0, 0, 0), (600) ,(440), ALLEGRO_ALIGN_CENTER, "Simulador de 8 LEDs conectados al puerto A.");
+    al_draw_text(font, al_map_rgb(0, 0, 0), (600) ,(470), ALLEGRO_ALIGN_CENTER,"Instrucciones:");
+    al_draw_text(font, al_map_rgb(0, 0, 0), (600) ,(500), ALLEGRO_ALIGN_CENTER," - Tocando la tecla b todos los leds encendidos comenzaran");
+    al_draw_text(font, al_map_rgb(0, 0, 0), (600) ,(520), ALLEGRO_ALIGN_CENTER,"a parpadear hasta que se presione");
+    al_draw_text(font, al_map_rgb(0, 0, 0), (600) ,(540), ALLEGRO_ALIGN_CENTER,"la misma tecla.");
+    al_draw_text(font, al_map_rgb(0, 0, 0), (600) ,(570), ALLEGRO_ALIGN_CENTER," - Debajo de cada LED hay un boton de prendido/apagado.");
     
     //Inicializa y dibuja el logo
     if (!al_init_image_addon()) {
@@ -166,103 +168,84 @@ int main(void) {
     
     al_flip_display();
     
-    char flag_b=0; //Flag de la tecla b  
+    char flag_b =0; //Flag de la tecla b  
+    char blink = 0;
     
     while (!close_display) {
         ALLEGRO_EVENT events;
         
         if (al_get_next_event(event_queue, &events)) //Toma un evento de la cola, VER RETURN EN DOCUMENT.
         {
-            if (events.type == ALLEGRO_EVENT_TIMER) {
-            if (key_pressed[KEY_B])
-                {
-                        if (flag_b == 0)
-                        {
-                           flag_b = 1;
-                        }
-                        else if (flag_b == 1)
-                        {
-                            flag_b = 0;
-                        }
-                }        
-                   if(flag_b==1)
-                       {
-                       
-                            if (bitGet(puertoA,0)==1){
-                                al_draw_filled_circle(B0_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(255,255,255));
-                            }
-                            if (bitGet(puertoA,1)==1){
-                                al_draw_filled_circle(B1_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(255,255,255));
-                            }
-                            if (bitGet(puertoA,2)==1){
-                                al_draw_filled_circle(B2_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(255,255,255));
-                            }
-                            if (bitGet(puertoA,3)==1){
-                                al_draw_filled_circle(B3_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(255,255,255));
-                            }
-                            if (bitGet(puertoA,4)==1){
-                                al_draw_filled_circle(B4_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(255,255,255));
-                            }
-                            if (bitGet(puertoA,5)==1){
-                                al_draw_filled_circle(B5_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(255,255,255));
-                            }
-                            if (bitGet(puertoA,6)==1){
-                                al_draw_filled_circle(B6_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(255,255,255));
-                            }
-                            if (bitGet(puertoA,7)==1){
-                                al_draw_filled_circle(B7_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(255,255,255));
-                            }
-                            
-                            al_flip_display();
-                            
-                            if (bitGet(puertoA,0)==1){
-                                al_draw_filled_circle(B0_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
-                            }
-                            if (bitGet(puertoA,1)==1){
-                                al_draw_filled_circle(B1_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
-                            }
-                            if (bitGet(puertoA,2)==1){
-                                al_draw_filled_circle(B2_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
-                            }
-                            if (bitGet(puertoA,3)==1){
-                                al_draw_filled_circle(B3_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
-                            }
-                            if (bitGet(puertoA,4)==1){
-                                al_draw_filled_circle(B4_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
-                            }
-                            if (bitGet(puertoA,5)==1){
-                                al_draw_filled_circle(B5_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
-                            }
-                            if (bitGet(puertoA,6)==1){
-                                al_draw_filled_circle(B6_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
-                            }
-                            if (bitGet(puertoA,7)==1){
-                                al_draw_filled_circle(B7_EJE_X,LEDs_EJE_Y,LEDs_RATIO,al_map_rgb(57,255,20));
-                            }                            
-                            al_flip_display();
-                       }
- 
-                
-            redraw = true;
-            }
-       
+            
             if (events.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
                 close_display = true;
             }
-            
-            else if (events.type == ALLEGRO_EVENT_KEY_DOWN) {
-                switch (events.keyboard.keycode) {
-                    case ALLEGRO_KEY_B:
-                        key_pressed[KEY_B] = true;
-                        break;
+
+            if (events.type == ALLEGRO_EVENT_KEY_DOWN){
+                if(events.keyboard.keycode == ALLEGRO_KEY_B){
+                    flag_b = !flag_b; // cada vez que se apreta la b empiece/deje de parpadear
                 }
+                
             }
-                else if (events.type == ALLEGRO_EVENT_KEY_UP) {
-                switch (events.keyboard.keycode) {
-                    case ALLEGRO_KEY_B:
-                        key_pressed[KEY_B] = false;
-                        break;
+            
+            if (events.type == ALLEGRO_EVENT_TIMER){
+                redraw = true;
+            }
+            
+            if (flag_b == 1 && redraw == true){
+                blink = !blink;
+                if (bitGet(puertoA,0)==1){
+                    manejo_leds(0,blink);
                 }
+                if (bitGet(puertoA,1)==1){
+                    manejo_leds(1,blink);
+                }
+                if (bitGet(puertoA,2)==1){
+                    manejo_leds(2,blink);
+                }
+                if (bitGet(puertoA,3)==1){
+                    manejo_leds(3,blink);
+                }
+                if (bitGet(puertoA,4)==1){
+                    manejo_leds(4,blink);
+                }
+                if (bitGet(puertoA,5)==1){
+                    manejo_leds(5,blink);
+                }
+                if (bitGet(puertoA,6)==1){
+                    manejo_leds(6,blink);
+                }
+                if (bitGet(puertoA,7)==1){
+                    manejo_leds(7,blink);
+                }
+                            
+            }else if(flag_b==0 && blink==0){ //se preisono nuevamente la b con los leds en verde
+                
+                if (bitGet(puertoA,0)==1){
+                    manejo_leds(0,!blink);
+                }
+                if (bitGet(puertoA,1)==1){
+                    manejo_leds(1,!blink);
+                }
+                if (bitGet(puertoA,2)==1){
+                    manejo_leds(2,!blink);
+                }
+                if (bitGet(puertoA,3)==1){
+                    manejo_leds(3,!blink);
+                }
+                if (bitGet(puertoA,4)==1){
+                    manejo_leds(4,!blink);
+                }
+                if (bitGet(puertoA,5)==1){
+                    manejo_leds(5,!blink);
+                }
+                if (bitGet(puertoA,6)==1){
+                    manejo_leds(6,!blink);
+                }
+                if (bitGet(puertoA,7)==1){
+                    manejo_leds(7,!blink);
+                }
+                
             }
             
             if(events.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
