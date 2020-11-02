@@ -43,7 +43,7 @@ static void manejo_leds(int led, bool estado);
 #define MASK 0x00FF
 
 #define FPS    1.0 //los led van a parpadear cada un segundo cada 1 segundo
-enum MYKEYS {KEY_B};//letras que se van a usar
+
 
 int main(void) {
     
@@ -53,33 +53,39 @@ int main(void) {
     ALLEGRO_FONT * font = NULL;
     ALLEGRO_BITMAP *logo;
     
-    bool close_display = false; //explicar bool tipo de dato
-    int i = 0;
-    bool redraw = false;
+    bool close_display = false; 
+    bool redraw = false; //se prende cada vez que se produce un evento por el timer
     
-    bool key_pressed[1] = {false};
 
     if (!al_init()) {
         fprintf(stderr, "failed to initialize allegro!\n");
         return -1;
     }
+    
+    //INICIALIZACION DE LA COLA DE EVENTOS
    
-    event_queue = al_create_event_queue(); //Allegro usa cola eventos, como las colas del super pero sin comida :( (por orden de llegada)
+    event_queue = al_create_event_queue();
     if (!event_queue) {
         fprintf(stderr, "failed to create event_queue!\n");
         return -1;
     }
     
+    //INICIALIZACION DEL TECLADO
+    
     if (!al_install_keyboard()) {
         fprintf(stderr, "failed to initialize the keyboard!\n");
         return -1;
     }
+    
+    //INICIALIZACION DEL TIMER
 
     timer = al_create_timer(1.0 / FPS);
     if (!timer) {
         fprintf(stderr, "failed to create timer!\n");
         return -1;
     }
+    
+    //INICIALIZACION DEL DISPLAY + DIMENSIONES + COLOR FONDO
    
     display = al_create_display(900,640); //(ancho,alto)
     al_set_window_title(display,"Simulador 8 LEDs en el puerto A");
@@ -89,7 +95,8 @@ int main(void) {
     }
     al_clear_to_color(al_map_rgb(255, 255, 255));
     
-    //Inicializa y dibuja el texto
+    //INICIALIZACION + DIBUJOS DE TEXTOS
+    
     al_init_font_addon(); // initialize the font addon
     al_init_ttf_addon(); // initialize the ttf (True Type Font) addon
     font = al_load_ttf_font("disney.ttf", 13, 0);
@@ -107,7 +114,8 @@ int main(void) {
     al_draw_text(font, al_map_rgb(0, 0, 0), (600) ,(540), ALLEGRO_ALIGN_CENTER,"la misma tecla.");
     al_draw_text(font, al_map_rgb(0, 0, 0), (600) ,(570), ALLEGRO_ALIGN_CENTER," - Debajo de cada LED hay un boton de prendido/apagado.");
     
-    //Inicializa y dibuja el logo
+    //INICIALIZACION + DIBUJO DE LOGO
+    
     if (!al_init_image_addon()) {
         fprintf(stderr, "Unable to start image addon \n"); //Igual que printf pero imprime al error std 
         al_uninstall_system();
@@ -126,6 +134,8 @@ int main(void) {
             500, 200, // TE LO DIBUJA DE 500 X200
             0);
     
+    //INICIALIZACION MOUSE
+    
     al_install_mouse();
     if (!al_is_mouse_installed()){
         close_display=al_show_native_message_box(display,"Error","No se pudo inicializar correctamente el mouse","El programa se cerrara automaticamente ","OK",ALLEGRO_MESSAGEBOX_ERROR);
@@ -134,10 +144,10 @@ int main(void) {
     
     //Registra el display a la cola de eventos, los eventos del display se iran guardando en la cola 
     // a medida que vayan sucediendo 
-    al_register_event_source(event_queue, al_get_display_event_source(display));
-    al_register_event_source(event_queue, al_get_mouse_event_source());
-    al_register_event_source(event_queue, al_get_timer_event_source(timer));
-    al_register_event_source(event_queue, al_get_keyboard_event_source()); //REGISTRAMOS EL TECLADO
+    al_register_event_source(event_queue, al_get_display_event_source(display)); //SE REGINTRAN LOS EVENTOS  DEL DISPLAY
+    al_register_event_source(event_queue, al_get_mouse_event_source()); //SE REGINTRAN LOS EVENTOS  DEL MOUSE
+    al_register_event_source(event_queue, al_get_timer_event_source(timer)); //SE REGINTRAN LOS EVENTOS  DEL TIMER
+    al_register_event_source(event_queue, al_get_keyboard_event_source()); //SE REGINTRAN LOS EVENTOS  DEL TECLADO
  
 
     //inicializacion del timer
@@ -153,9 +163,9 @@ int main(void) {
     al_draw_circle(B5_EJE_X,LEDs_EJE_Y,LEDs_RATIO+2,al_map_rgb(0,0,0),2);
     al_draw_circle(B6_EJE_X,LEDs_EJE_Y,LEDs_RATIO+2,al_map_rgb(0,0,0),2);
     al_draw_circle(B7_EJE_X,LEDs_EJE_Y,LEDs_RATIO+2,al_map_rgb(0,0,0),2);
-    //inicializacion de botones
     
-
+    //inicializacion de botones
+   
     int n;
     for(n=1;n<=8;n++){
         draw_mouse_button_led(n,true);
@@ -168,13 +178,13 @@ int main(void) {
     
     al_flip_display();
     
-    char flag_b =0; //Flag de la tecla b  
-    char blink = 0;
+    char flag_b =0; //Flag -> existencia evento de la tecla b  
+    char blink = 0; //manejar el parpadeo de los lEDs
     
-    while (!close_display) {
+    while (!close_display) { // mientras que no se cierre el display con el evento de cierre
         ALLEGRO_EVENT events;
         
-        if (al_get_next_event(event_queue, &events)) //Toma un evento de la cola, VER RETURN EN DOCUMENT.
+        if (al_get_next_event(event_queue, &events)) //Toma un evento de la cola.
         {
             
             if (events.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
@@ -183,7 +193,7 @@ int main(void) {
 
             if (events.type == ALLEGRO_EVENT_KEY_DOWN){
                 if(events.keyboard.keycode == ALLEGRO_KEY_B){
-                    flag_b = !flag_b; // cada vez que se apreta la b empiece/deje de parpadear
+                    flag_b = !flag_b; 
                 }
                 
             }
@@ -192,7 +202,7 @@ int main(void) {
                 redraw = true;
             }
             
-            if (flag_b == 1 && redraw == true){
+            if (flag_b == 1 && redraw == true){ // presiona tecla b + evento timer = LEDs encendidos deben prenderse y apagarse
                 blink = !blink;
                 if (bitGet(puertoA,0)==1){
                     manejo_leds(0,blink);
@@ -219,7 +229,7 @@ int main(void) {
                     manejo_leds(7,blink);
                 }
                             
-            }else if(flag_b==0 && blink==0){ //se preisono nuevamente la b con los leds en verde
+            }else if(flag_b==0 && blink==0){ //cuando se presiona nuevamente la b. Los lEDs queden encendidos
                 
                 if (bitGet(puertoA,0)==1){
                     manejo_leds(0,!blink);
@@ -248,7 +258,7 @@ int main(void) {
                 
             }
             
-            if(events.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
+            if(events.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){ //evento click mouse. Se analizan las coordenadas del mouse simulando un boton. Se cambia el estado del LED y el color del boton.
                 
                 al_flip_display();
                 if(events.mouse.x <= B0_EJE_X+(BOTON_ANCHO/2) && events.mouse.x >= B0_EJE_X-(BOTON_ANCHO/2) && events.mouse.y <= LEDs_EJE_Y+BOTON_OFFSET_LED+(BOTON_ALTO/2) && events.mouse.y >= LEDs_EJE_Y+BOTON_OFFSET_LED-(BOTON_ALTO/2)){
@@ -404,8 +414,8 @@ int main(void) {
 
     return (EXIT_SUCCESS);
 }
-
-static void draw_mouse_button_led(int but, bool down)
+// funcion para cambiar el color de los botones que manjean el encendido y apagado de los LEDS
+static void draw_mouse_button_led(int but, bool down) 
  {
     int offset[8] = {B0_EJE_X, B1_EJE_X, B2_EJE_X, B3_EJE_X,B4_EJE_X, B5_EJE_X, B6_EJE_X, B7_EJE_X};
     ALLEGRO_COLOR grey;
@@ -423,6 +433,7 @@ static void draw_mouse_button_led(int but, bool down)
     }
  }
 
+//funcion para cambiar el color de los botones actuan sobre todos los LEDs
 static void button_msk(int but, bool estado){
     int offset[3]={BOTON_TOGGLE_EJE_Y,BOTON_ON_EJE_Y,BOTON_OFF_EJE_Y};
     int x = BOTON_OFFSET_EJE_X;
@@ -442,6 +453,7 @@ static void button_msk(int but, bool estado){
     
 }
 
+//funcion para cambiar el color de los LEDs
 static void manejo_leds(int led, bool estado){
     int offset[8] = {B0_EJE_X, B1_EJE_X, B2_EJE_X, B3_EJE_X,B4_EJE_X, B5_EJE_X, B6_EJE_X, B7_EJE_X};
     ALLEGRO_COLOR grey = al_map_rgb(155, 155, 155);;
